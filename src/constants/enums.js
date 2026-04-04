@@ -1,0 +1,45 @@
+const GENDER_TYPES = {
+    MALE: 1,
+    FEMALE: 2,
+    OTHER: 3
+}
+
+const GENRE_TYPES = {
+    FICTION: 1,
+    NON_FICTION: 2,
+    MYSTERY: 3,
+    THRILLER: 4,
+    ROMANCE: 5,
+    SCIENCE_FICTION: 6,
+    FANTASY: 7,
+    HISTORICAL_FICTION: 8,
+    BIOGRAPHY: 9,
+    AUTOBIOGRAPHY: 10,
+    SELF_HELP: 11,
+    BUSINESS: 12,
+    HISTORY: 13,
+    SCIENCE: 14,
+    TECHNOLOGY: 15,
+    HEALTH: 16,
+    FITNESS: 17,
+    COOKING: 18,
+    TRAVEL: 19,
+    ART: 20,
+    PHOTOGRAPHY: 21,
+    MUSIC: 22,
+    FILM: 23,
+    SPORTS: 24,
+    EDUCATION: 25,
+    CHILDREN: 26,
+    YOUNG_ADULT: 27,
+    POETRY: 28,
+    DRAMA: 29,
+    HORROR: 30,
+    ADVENTURE: 31,
+    CRIME: 32,
+    THRILLER: 33,
+    MYSTERY: 34,
+
+}
+
+module.exports = { GENDER_TYPES, GENRE_TYPES }
