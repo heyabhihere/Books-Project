@@ -42,4 +42,9 @@ const GENRE_TYPES = {
 
 }
 
-module.exports = { GENDER_TYPES, GENRE_TYPES }
+const OTP_TYPES = {
+    SIGNUP: 1,
+    FORGOT_PASSWORD: 2,
+}
+
+module.exports = { GENDER_TYPES, GENRE_TYPES, OTP_TYPES }

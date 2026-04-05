@@ -1,6 +1,17 @@
 const { loginValidation, changePasswordValidation, userRegister, updateProfileValidation } = require("../../utills/validations/users");
 const Users = require('../../models/user');
-const { registerUser, verifyOtp: verifyOtpService, loginUser, changePasswordService, userList, updateProfileService } = require("../services/users");
+const { OTP_TYPES } = require("../../constants/enums");
+const {
+    registerUser,
+    verifyOtp: verifyOtpService,
+    resendOtpService,
+    loginUser,
+    changePasswordService,
+    userList,
+    updateProfileService,
+    forgetPasswordService,
+    resetPasswordService,
+} = require("../services/users");
 
 //signup
 const register = async (req, res) => {
@@ -11,19 +22,30 @@ const register = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ msg: "User already exist" });
         }
-        const result = await registerUser(req.body);
+        await registerUser(req.body);
         res.status(200).json({ message: "OTP sent successfully" });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 };
 
-//verify-otp
+// verify-otp — body: { email, otp, type: 1 (signup) | 2 (forgot-password) }
 const verifyOtp = async (req, res) => {
-    const { email, otp } = req.body;
+    const { email, otp, type } = req.body;
     try {
-        const result = await verifyOtpService(email, otp);
-        res.status(200).json({ message: "Email verified successfully", token: result.token });
+        const result = await verifyOtpService(email, otp, Number(type));
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+// resend-otp — body: { email }
+const resendOtp = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const result = await resendOtpService(email);
+        res.status(200).json(result);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
@@ -62,6 +84,7 @@ const getAllUserList = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 }
+
 const updateProfile = async (req, res) => {
     try {
         await updateProfileValidation.validateAsync(req.body);
@@ -73,4 +96,36 @@ const updateProfile = async (req, res) => {
     }
 };
 
-module.exports = { register, verifyOtp, login, changePassword, getAllUserList, updateProfile }
+// forgot-password — body: { email }
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const result = await forgetPasswordService(email);
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+// reset-password — body: { resetToken, newPassword }
+const resetPassword = async (req, res) => {
+    const { resetToken, newPassword } = req.body;
+    try {
+        const result = await resetPasswordService(resetToken, newPassword);
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+module.exports = {
+    register,
+    verifyOtp,
+    resendOtp,
+    login,
+    changePassword,
+    getAllUserList,
+    updateProfile,
+    forgotPassword,
+    resetPassword,
+}

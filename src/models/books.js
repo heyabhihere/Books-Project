@@ -3,6 +3,11 @@ const { GENRE_TYPES } = require("../constants/enums");
 
 const books = mongoose.Schema(
     {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
         bookName: {
             type: String,
             required: true

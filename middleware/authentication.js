@@ -27,5 +27,27 @@ const authenticator = async (req, res, next) => {
         res.status(403).json({ msg: "Invalid or expired token" });
     }
 };
+const optionalAuthenticator = async (req, res, next) => {
+    try {
+        const bearerHeader = req.headers["authorization"];
 
-module.exports = { authenticator }
+        if (!bearerHeader || !bearerHeader.startsWith("Bearer ")) {
+            return next(); // Proceed without setting req.user
+        }
+
+        const token = bearerHeader.split(" ")[1];
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = await users.findById(decoded.userId);
+        if (user) {
+            req.user = user;
+        }
+        next();
+    } catch (err) {
+        // Log but do not block the route, allow unauthenticated access to proceed
+        console.error("Optional Auth Error:", err.message);
+        next();
+    }
+};
+
+module.exports = { authenticator, optionalAuthenticator };
