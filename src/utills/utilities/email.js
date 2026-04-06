@@ -3,9 +3,9 @@ const { NODE_MAILER_EMAIL, NODE_MAILER_EMAIL_PASSKEY } = require('../../../confi
 
 const sendEmail = async (id, otp) => {
     const transporter = nodemailer.createTransport({
-        service: "gmail",
-        port: 587,
-        secure: false,
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
         auth: {
             user: NODE_MAILER_EMAIL,
             pass: NODE_MAILER_EMAIL_PASSKEY,
