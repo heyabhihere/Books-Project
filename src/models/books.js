@@ -28,7 +28,15 @@ const books = mongoose.Schema(
         image: {
             type: String,
             required: true
-        }
+        },
+        likes: {
+            type: Number,
+            default: 0
+        },
+        likedBy: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }]
 
     },
     { timestamps: true }

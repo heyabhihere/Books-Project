@@ -69,4 +69,26 @@ const deleteBook = async (req, res) => {
     }
 }
 
-module.exports = { getBooks, getAllBooks, getBookDetails, addBook, updateBook, deleteBook }
+const likeBook = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        const result = await booksService.likeBook(id, userId);
+        res.status(200).json({ book: result.book, hasLiked: result.hasLiked, message: result.hasLiked ? "Book liked successfully" : "Book unliked successfully" });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
+const getBookLikes = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        const result = await booksService.getBookLikes(id, userId);
+        res.status(200).json({ likesCount: result.likes, likedBy: result.likedBy });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
+module.exports = { getBooks, getAllBooks, getBookDetails, addBook, updateBook, deleteBook, likeBook, getBookLikes }

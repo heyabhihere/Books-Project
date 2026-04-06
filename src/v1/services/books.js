@@ -14,8 +14,16 @@ const getBooks = async (userId, page, limit, search, genre) => {
         if (genre !== undefined && genre !== null && genre !== '') {
             query.genre = Number(genre);
         }
+        const parsedPage = parseInt(page, 10) || 1;
+        const parsedLimit = parseInt(limit, 10) || 10;
 
-        const books = await booksSchema.find(query).skip((page - 1) * limit).limit(Number(limit));
+        let books = await booksSchema.find(query).skip((parsedPage - 1) * parsedLimit).limit(parsedLimit).lean();
+        books = books.map(book => {
+            book.isLiked = userId ? (book.likedBy || []).some(id => id.toString() === userId.toString()) : false;
+            delete book.likedBy;
+            return book;
+        });
+
         const total = await booksSchema.countDocuments(query);
         return { books, total };
     } catch (error) {
@@ -47,7 +55,13 @@ const getAllBooks = async (userId, page = 1, limit = 10, search, genre) => {
         const parsedPage = parseInt(page, 10) || 1;
         const parsedLimit = parseInt(limit, 10) || 10;
 
-        const books = await booksSchema.find(query).skip((parsedPage - 1) * parsedLimit).limit(parsedLimit);
+        let books = await booksSchema.find(query).skip((parsedPage - 1) * parsedLimit).limit(parsedLimit).lean();
+        books = books.map(book => {
+            book.isLiked = userId ? (book.likedBy || []).some(id => id.toString() === userId.toString()) : false;
+            delete book.likedBy;
+            return book;
+        });
+
         const total = await booksSchema.countDocuments(query);
         return { books, total };
     } catch (error) {
@@ -58,8 +72,10 @@ const getAllBooks = async (userId, page = 1, limit = 10, search, genre) => {
 
 const getBookDetails = async (id, userId) => {
     try {
-        const book = await booksSchema.findOne({ _id: id, userId });
+        let book = await booksSchema.findOne({ _id: id, userId }).lean();
         if (book) {
+            book.isLiked = userId ? (book.likedBy || []).some(id => id.toString() === userId.toString()) : false;
+            delete book.likedBy;
             return { book };
         } else {
             throw new Error("Book not found");
@@ -110,4 +126,43 @@ const deleteBook = async (id, userId) => {
 
 
 
-module.exports = { getBooks, getAllBooks, getBookDetails, addBook, updateBook, deleteBook }
+const likeBook = async (id, userId) => {
+    try {
+        const book = await booksSchema.findById(id);
+        if (!book) {
+            throw new Error("Book not found");
+        }
+
+        const hasLiked = book.likedBy.includes(userId);
+        if (hasLiked) {
+            // Unlike it
+            book.likedBy = book.likedBy.filter(uid => uid.toString() !== userId.toString());
+            book.likes = book.likes - 1;
+        } else {
+            // Like it
+            book.likedBy.push(userId);
+            book.likes = book.likes + 1;
+        }
+        await book.save();
+        return { book, hasLiked: !hasLiked }; // Return the new like status
+    } catch (error) {
+        throw error;
+    }
+}
+
+const getBookLikes = async (id, userId) => {
+    try {
+        const book = await booksSchema.findOne({ _id: id, userId })
+            .select('likedBy likes')
+            .populate('likedBy', 'name email'); // only load name and email
+
+        if (!book) {
+            throw new Error("Book not found or you don't have permission to view it");
+        }
+        return book;
+    } catch (error) {
+        throw error;
+    }
+}
+
+module.exports = { getBooks, getAllBooks, getBookDetails, addBook, updateBook, deleteBook, likeBook, getBookLikes }
