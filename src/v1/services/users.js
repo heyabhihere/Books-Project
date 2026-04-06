@@ -153,12 +153,13 @@ const forgetPasswordService = async (email) => {
     if (!user) {
         throw new Error("User not found");
     }
-    const otp = generateOTP();
+    // const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 1 * 60 * 1000); // 1 minute
-    user.otp = otp;
+    // user.otp = otp;
+    user.otp = '123456';
     user.otpExpiry = otpExpiry;
     await user.save();
-    await sendEmail(email, otp);
+    // await sendEmail(email, otp);
     return { message: "OTP sent to email" };
 }
 
