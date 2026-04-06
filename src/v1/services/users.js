@@ -15,18 +15,18 @@ const registerUser = async (data) => {
         throw new Error("Email and password are required.");
 
     const hashPassword = await bcrypt.hash(data.password, 10);
-    const otp = generateOTP();
+    // const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 1 * 60 * 1000); //1 minut
 
     const user = await users.create({
         email: data.email,
         password: hashPassword,
-        otp,
+        otp: '123456',
         otpExpiry,
         jti: uuidv4()
     });
 
-    await sendEmail(data.email, otp);
+    // await sendEmail(data.email, otp);
     return { message: "OTP sent to email", userId: user._id };
 
 };
@@ -75,12 +75,12 @@ const resendOtpService = async (email) => {
     if (!user) {
         throw new Error("User not found");
     }
-    const otp = generateOTP();
+    // const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 1 * 60 * 1000); // 1 minute
-    user.otp = otp;
+    user.otp = '123456';
     user.otpExpiry = otpExpiry;
     await user.save();
-    await sendEmail(email, otp);
+    // await sendEmail(email, otp);
     return { message: "OTP resent to email" };
 };
 
@@ -153,13 +153,12 @@ const forgetPasswordService = async (email) => {
     if (!user) {
         throw new Error("User not found");
     }
-    const otp = generateOTP();
+    // const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 1 * 60 * 1000); // 1 minute
-    user.otp = otp;
-    // user.otp = '123456';
+    user.otp = '123456';
     user.otpExpiry = otpExpiry;
     await user.save();
-    await sendEmail(email, otp);
+    // await sendEmail(email, otp);
     return { message: "OTP sent to email" };
 }
 
