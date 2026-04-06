@@ -10,6 +10,9 @@ const sendEmail = async (id, otp) => {
             user: NODE_MAILER_EMAIL,
             pass: NODE_MAILER_EMAIL_PASSKEY,
         },
+        tls: {
+            rejectUnauthorized: true
+        }
     });
 
 
